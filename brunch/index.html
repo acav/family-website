@@ -717,22 +717,22 @@ async function submitRSVP() {
   btn.disabled = true;
   btn.textContent = "Sending…";
 
-  const payload = { date: selectedDate, name, email, adults, kids, allergies, comments, interest: isInterestMode };
+  const payload = new URLSearchParams({
+  date: selectedDate,
+  name, email, adults, kids,
+  allergies: allergies || "",
+  comments: comments || "",
+  interest: isInterestMode ? "true" : "false"
+});
 
-  try {
-    await fetch(SCRIPT_URL, {
-      method: "POST",
-      mode: "no-cors",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-    showSuccess(isInterestMode);
-  } catch (err) {
-    showFormError("Something went wrong — please try again or email us directly.");
-    btn.disabled = false;
-    btn.textContent = "Send my RSVP 🎉";
-  }
-}
+try {
+  await fetch(SCRIPT_URL, {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: payload.toString(),
+  });
+  showSuccess(isInterestMode);
 
 function showFormError(msg) {
   const errEl = document.getElementById("formError");

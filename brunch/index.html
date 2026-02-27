@@ -744,7 +744,7 @@ function showSuccess(interestMode) {
   const title = interestMode ? "Interest noted!" : "You're on the list!";
   const body  = interestMode
     ? "We've got your note — we'll be in touch if we can make it work. So glad you're keen!"
-    : "We'll review and confirm your spot — you'll receive a calendar invite by email once approved. Can't wait to see you!";
+    : "We'll review and confirm your spot — you'll receive a calendar invite by email. Can't wait to see you!";
   document.querySelector("#successContent .success-title").textContent = title;
   document.querySelector("#successContent .success-body").textContent  = body;
   document.getElementById("modalFormContent").style.display = "none";

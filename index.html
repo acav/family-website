@@ -3,754 +3,182 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Saturday Brunch</title>
+<title>Alex & Anthony</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 
 <style>
-  /* ── CONFIGURATION ─────────────────────────────────── */
-  /* Change SCRIPT_URL to your deployed Apps Script URL  */
-  /* Change SITE_PASSWORD below in the JS section        */
-
   :root {
-    --cream:   #F4F7FA;
-    --green:   #1E3A5F;
-    --sage:    #5B8DB8;
-    --blush:   #A8C8E8;
-    --warm:    #E0EBF5;
-    --text:    #1A2634;
-    --muted:   #6B7D8E;
-    --white:   #FFFFFF;
-    --radius:  12px;
+    --cream:  #F4F7FA;
+    --navy:   #1E3A5F;
+    --sage:   #5B8DB8;
+    --blush:  #A8C8E8;
+    --warm:   #E0EBF5;
+    --text:   #1A2634;
+    --muted:  #6B7D8E;
+    --white:  #FFFFFF;
   }
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  html { scroll-behavior: smooth; }
+  html, body { height: 100%; }
 
   body {
     font-family: 'DM Sans', sans-serif;
     background: var(--cream);
     color: var(--text);
     min-height: 100vh;
+    display: flex;
+    flex-direction: column;
   }
 
-  /* ── PASSWORD GATE ──────────────────────────────────── */
-  #gate {
-    position: fixed; inset: 0;
-    background: var(--green);
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    z-index: 1000;
-    transition: opacity 0.6s ease;
-  }
-  #gate.fade-out { opacity: 0; pointer-events: none; }
-
-  .gate-inner {
-    text-align: center;
-    animation: fadeUp 0.8s ease both;
-  }
-  .gate-leaf {
-    font-size: 2.5rem;
-    margin-bottom: 1.5rem;
-    display: block;
-  }
-  .gate-title {
-    font-family: 'Playfair Display', serif;
-    color: var(--white);
-    font-size: clamp(1.8rem, 5vw, 2.8rem);
-    margin-bottom: 0.5rem;
-  }
-  .gate-sub {
-    color: var(--sage);
-    font-size: 1rem;
-    font-weight: 300;
-    margin-bottom: 2.5rem;
-    letter-spacing: 0.05em;
-  }
-  .gate-form {
-    display: flex; gap: 0.5rem;
+  /* ── HERO ───────────────────────────────────────────── */
+  .hero {
+    background: var(--navy);
+    flex: 1;
+    display: flex;
     flex-direction: column;
     align-items: center;
-    width: 280px;
-  }
-  .gate-input {
-    width: 100%;
-    padding: 0.85rem 1.2rem;
-    background: rgba(255,255,255,0.08);
-    border: 1px solid rgba(255,255,255,0.2);
-    border-radius: var(--radius);
-    color: var(--white);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 1rem;
+    justify-content: center;
     text-align: center;
-    letter-spacing: 0.15em;
-    outline: none;
-    transition: border-color 0.2s;
-  }
-  .gate-input::placeholder { color: rgba(255,255,255,0.3); letter-spacing: 0.05em; }
-  .gate-input:focus { border-color: var(--blush); }
-  .gate-btn {
-    width: 100%;
-    padding: 0.85rem;
-    background: var(--blush);
-    border: none; border-radius: var(--radius);
-    color: var(--green);
-    font-family: 'DM Sans', sans-serif;
-    font-weight: 500;
-    font-size: 0.95rem;
-    cursor: pointer;
-    transition: background 0.2s, transform 0.1s;
-    margin-top: 0.25rem;
-  }
-  .gate-btn:hover { background: #f0cca8; transform: translateY(-1px); }
-  .gate-error {
-    color: #FF9999;
-    font-size: 0.85rem;
-    margin-top: 0.5rem;
-    min-height: 1.2em;
-  }
-
-  /* ── MAIN LAYOUT ────────────────────────────────────── */
-  #main { display: none; }
-  #main.visible { display: block; }
-
-  /* ── HEADER ─────────────────────────────────────────── */
-  header {
-    background: var(--green);
-    padding: 3.5rem 2rem 3rem;
-    text-align: center;
+    padding: 4rem 2rem;
     position: relative;
     overflow: hidden;
   }
-  header::before {
+
+  .hero::before {
     content: '';
     position: absolute; inset: 0;
-    background: radial-gradient(ellipse at 30% 50%, rgba(91,141,184,0.2) 0%, transparent 60%),
-                radial-gradient(ellipse at 70% 20%, rgba(168,200,232,0.1) 0%, transparent 50%);
+    background:
+      radial-gradient(ellipse at 20% 60%, rgba(91,141,184,0.18) 0%, transparent 55%),
+      radial-gradient(ellipse at 80% 20%, rgba(168,200,232,0.1) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 100%, rgba(30,58,95,0.4) 0%, transparent 60%);
     pointer-events: none;
   }
-  .header-icon { font-size: 2.2rem; display: block; margin-bottom: 1rem; }
-  .header-title {
-    font-family: 'Playfair Display', serif;
-    color: var(--white);
-    font-size: clamp(2rem, 6vw, 3.2rem);
-    line-height: 1.2;
-    margin-bottom: 1.2rem;
-  }
-  .header-title em { font-style: italic; color: var(--blush); }
-  .header-intro {
-    max-width: 560px;
-    margin: 0 auto;
-    color: rgba(255,255,255,0.75);
-    font-size: 1rem;
-    font-weight: 300;
-    line-height: 1.7;
-  }
-  .header-detail {
-    margin-top: 1.8rem;
-    display: inline-flex; gap: 1.5rem;
-    flex-wrap: wrap; justify-content: center;
-  }
-  .header-chip {
-    background: rgba(255,255,255,0.1);
-    border: 1px solid rgba(255,255,255,0.15);
-    border-radius: 50px;
-    padding: 0.4rem 1.1rem;
-    color: rgba(255,255,255,0.85);
-    font-size: 0.85rem;
-    letter-spacing: 0.03em;
+
+  .hero-content {
+    position: relative;
+    z-index: 1;
+    animation: fadeUp 0.9s ease both;
   }
 
-  /* ── DATES SECTION ──────────────────────────────────── */
-  .section {
-    max-width: 700px;
-    margin: 0 auto;
-    padding: 3rem 1.5rem;
-  }
-  .section-heading {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.5rem;
-    color: var(--green);
-    margin-bottom: 0.5rem;
-  }
-  .section-sub {
-    color: var(--muted);
-    font-size: 0.9rem;
-    margin-bottom: 2rem;
-    font-weight: 300;
-  }
-
-  /* loading */
-  .loading {
-    text-align: center;
-    color: var(--muted);
-    padding: 3rem;
-    font-size: 0.9rem;
-  }
-  .spinner {
-    width: 28px; height: 28px;
-    border: 2px solid var(--warm);
-    border-top-color: var(--sage);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-    margin: 0 auto 1rem;
-  }
-
-  /* date cards */
-  .dates-list { display: flex; flex-direction: column; gap: 1rem; }
-
-  .date-card {
-    background: var(--white);
-    border-radius: var(--radius);
-    border: 1px solid rgba(0,0,0,0.07);
-    padding: 1.4rem 1.6rem;
-    display: flex; align-items: center; justify-content: space-between;
-    gap: 1rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-    transition: box-shadow 0.2s, transform 0.2s;
-    animation: fadeUp 0.4s ease both;
-  }
-  .date-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); transform: translateY(-1px); }
-
-  .date-left { flex: 1; }
-  .date-month {
-    font-size: 0.7rem;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    color: var(--sage);
-    font-weight: 500;
-    margin-bottom: 0.15rem;
-  }
-  .date-day {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.5rem;
-    color: var(--green);
-    line-height: 1.1;
-  }
-  .date-weekday {
-    font-size: 0.8rem;
-    color: var(--muted);
-    margin-top: 0.1rem;
-    font-weight: 300;
-  }
-
-  .date-middle { flex: 1; text-align: center; }
-  .date-spots {
-    font-size: 0.82rem;
-    color: var(--muted);
-    font-weight: 300;
-  }
-  .date-label {
-    display: inline-block;
-    background: var(--warm);
-    color: var(--green);
-    font-size: 0.78rem;
-    font-weight: 500;
-    padding: 0.25rem 0.75rem;
-    border-radius: 50px;
-    letter-spacing: 0.03em;
-  }
-
-  .date-right { flex-shrink: 0; }
-  .rsvp-btn {
-    padding: 0.6rem 1.4rem;
-    background: var(--green);
-    color: var(--white);
-    border: none; border-radius: 50px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.85rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background 0.2s, transform 0.1s;
-    white-space: nowrap;
-  }
-  .rsvp-btn:hover { background: #2a527a; transform: translateY(-1px); }
-  .rsvp-btn:disabled {
-    background: var(--warm);
-    color: var(--muted);
-    cursor: not-allowed;
-    transform: none;
-  }
-  .full-tag {
-    font-size: 0.78rem;
-    color: var(--muted);
-    font-style: italic;
-  }
-
-  /* ── RSVP MODAL ─────────────────────────────────────── */
-  .modal-bg {
-    position: fixed; inset: 0;
-    background: rgba(44,44,44,0.55);
-    backdrop-filter: blur(4px);
-    z-index: 500;
-    display: flex; align-items: center; justify-content: center;
-    padding: 1.5rem;
-    opacity: 0; pointer-events: none;
-    transition: opacity 0.3s;
-  }
-  .modal-bg.open { opacity: 1; pointer-events: all; }
-
-  .modal {
-    background: var(--white);
-    border-radius: 16px;
-    max-width: 480px; width: 100%;
-    padding: 2.2rem 2rem;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
-    transform: translateY(20px);
-    transition: transform 0.3s;
-    max-height: 90vh;
-    overflow-y: auto;
-  }
-  .modal-bg.open .modal { transform: translateY(0); }
-
-  .modal-header {
-    display: flex; align-items: flex-start; justify-content: space-between;
-    margin-bottom: 1.8rem;
-  }
-  .modal-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.4rem;
-    color: var(--green);
-    line-height: 1.2;
-  }
-  .modal-date-label {
-    font-size: 0.85rem;
-    color: var(--muted);
-    margin-top: 0.2rem;
-    font-weight: 300;
-  }
-  .modal-close {
-    background: none; border: none;
-    font-size: 1.3rem; cursor: pointer;
-    color: var(--muted); line-height: 1;
-    padding: 0.2rem;
-    transition: color 0.2s;
-  }
-  .modal-close:hover { color: var(--text); }
-
-  .form-row { margin-bottom: 1.1rem; }
-  .form-label {
+  .hero-icon {
+    font-size: 2rem;
     display: block;
-    font-size: 0.82rem;
-    font-weight: 500;
-    color: var(--green);
-    margin-bottom: 0.35rem;
-    letter-spacing: 0.02em;
+    margin-bottom: 1.5rem;
+    opacity: 0.9;
   }
-  .form-label span { color: var(--muted); font-weight: 400; }
-  .form-input, .form-select, .form-textarea {
-    width: 100%;
-    padding: 0.7rem 0.9rem;
-    border: 1.5px solid #E0DDD8;
-    border-radius: 8px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.93rem;
-    color: var(--text);
-    background: var(--cream);
-    outline: none;
-    transition: border-color 0.2s, background 0.2s;
-  }
-  .form-input:focus, .form-select:focus, .form-textarea:focus {
-    border-color: var(--sage);
-    background: var(--white);
-  }
-  .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
-  .form-textarea { resize: vertical; min-height: 70px; }
 
-  .form-submit {
-    width: 100%;
-    padding: 0.85rem;
-    background: var(--green);
-    color: var(--white);
-    border: none; border-radius: 50px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 1rem;
-    font-weight: 500;
-    cursor: pointer;
-    margin-top: 0.5rem;
-    transition: background 0.2s, transform 0.1s;
-  }
-  .form-submit:hover { background: #2a527a; transform: translateY(-1px); }
-  .form-submit:disabled { background: var(--sage); cursor: not-allowed; transform: none; }
-
-  /* ── SUCCESS STATE ──────────────────────────────────── */
-  .success-msg {
-    text-align: center;
-    padding: 1rem 0;
-  }
-  .success-icon { font-size: 2.5rem; margin-bottom: 1rem; }
-  .success-title {
+  .hero-names {
     font-family: 'Playfair Display', serif;
-    color: var(--green);
-    font-size: 1.4rem;
-    margin-bottom: 0.5rem;
+    color: var(--white);
+    font-size: clamp(2.4rem, 7vw, 4rem);
+    line-height: 1.15;
+    margin-bottom: 0.4rem;
   }
-  .success-body {
-    color: var(--muted);
-    font-size: 0.9rem;
-    line-height: 1.6;
+
+  .hero-names em {
+    font-style: italic;
+    color: var(--blush);
+  }
+
+  .hero-divider {
+    width: 40px;
+    height: 1.5px;
+    background: var(--sage);
+    margin: 1.6rem auto;
+    opacity: 0.6;
+  }
+
+  .hero-intro {
+    max-width: 480px;
+    margin: 0 auto;
+    color: rgba(255,255,255,0.72);
+    font-size: 1.05rem;
     font-weight: 300;
+    line-height: 1.8;
   }
+
+  /* ── LINKS ──────────────────────────────────────────── */
+  .links {
+    margin-top: 2.8rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    justify-content: center;
+  }
+
+  .link-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.65rem 1.4rem;
+    border-radius: 50px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: transform 0.15s, background 0.2s;
+    cursor: pointer;
+  }
+
+  .link-btn:hover { transform: translateY(-2px); }
+
+  .link-btn-primary {
+    background: var(--blush);
+    color: var(--navy);
+  }
+  .link-btn-primary:hover { background: #bdd4ec; }
+
+  .link-btn-ghost {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.18);
+    color: rgba(255,255,255,0.8);
+  }
+  .link-btn-ghost:hover { background: rgba(255,255,255,0.14); }
 
   /* ── FOOTER ─────────────────────────────────────────── */
   footer {
+    background: var(--navy);
+    border-top: 1px solid rgba(255,255,255,0.07);
     text-align: center;
-    padding: 2.5rem 1.5rem;
-    color: var(--muted);
-    font-size: 0.8rem;
+    padding: 1.2rem;
+    color: rgba(255,255,255,0.3);
+    font-size: 0.75rem;
     font-weight: 300;
-    border-top: 1px solid rgba(0,0,0,0.06);
+    letter-spacing: 0.03em;
   }
 
-  /* ── ANIMATIONS ─────────────────────────────────────── */
+  /* ── ANIMATION ──────────────────────────────────────── */
   @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(16px); }
+    from { opacity: 0; transform: translateY(20px); }
     to   { opacity: 1; transform: translateY(0); }
   }
-  @keyframes spin {
-    to { transform: rotate(360deg); }
-  }
 
-  /* ── RESPONSIVE ─────────────────────────────────────── */
   @media (max-width: 480px) {
-    .date-card { flex-direction: column; align-items: flex-start; }
-    .date-middle { text-align: left; }
-    .form-row-2 { grid-template-columns: 1fr; }
-    .modal { padding: 1.6rem 1.4rem; }
+    .hero-names { font-size: 2.2rem; }
+    .hero-intro { font-size: 0.95rem; }
   }
 </style>
 </head>
 <body>
 
-<!-- ══════════════════════════════════════════════════════
-     PASSWORD GATE
-═══════════════════════════════════════════════════════ -->
-<div id="gate">
-  <div class="gate-inner">
-    <span class="gate-leaf">🥐</span>
-    <h1 class="gate-title">Saturday Brunch</h1>
-    <p class="gate-sub">A gathering for the people we love</p>
-    <div class="gate-form">
-      <input
-        type="password"
-        class="gate-input"
-        id="pwInput"
-        placeholder="enter password"
-        autocomplete="off"
-        autofocus
-      >
-      <button class="gate-btn" onclick="checkPassword()">Enter</button>
-      <span class="gate-error" id="gateError"></span>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════════════════════════════════════════════════
-     MAIN SITE
-═══════════════════════════════════════════════════════ -->
-<div id="main">
-
-  <header>
-    <span class="header-icon">🥐</span>
-    <h1 class="header-title">
-      Saturday<br><em>Brunch</em>
-    </h1>
-    <p class="header-intro">
-      This year, we made a goal as a family: to host more, and to bring together
-      the people we love most. These are our Saturday mornings — come hungry,
-      stay as long as you like, and expect good food and even better company.
+<section class="hero">
+  <div class="hero-content">
+    <span class="hero-icon">🏠</span>
+    <h1 class="hero-names">Alex <em>&</em> Anthony</h1>
+    <div class="hero-divider"></div>
+    <p class="hero-intro">
+      We're using this little corner of the internet to stay more connected
+      with the people we love most — friends, family, and everyone in between.
+      Expect invitations, updates, and the occasional gathering.
     </p>
-    <div class="header-detail">
-      <span class="header-chip">⏰ Saturdays at 10:30am</span>
-      <span class="header-chip">📍 Our apt (92nd / Amsterdam)</span>
-    </div>
-  </header>
 
-  <div class="section">
-    <h2 class="section-heading">Upcoming Dates</h2>
-    <p class="section-sub">See a date that works? Click to let us know you're free.</p>
-
-    <div class="loading" id="loadingState">
-      <div class="spinner"></div>
-      Loading upcoming dates…
-    </div>
-
-    <div class="dates-list" id="datesList" style="display:none;"></div>
   </div>
+</section>
 
-  <footer>
-    Made with love for the people we love &nbsp;❤️
-  </footer>
-</div>
-
-<!-- ══════════════════════════════════════════════════════
-     RSVP MODAL
-═══════════════════════════════════════════════════════ -->
-<div class="modal-bg" id="modalBg" onclick="handleModalBgClick(event)">
-  <div class="modal" id="modal">
-    <div id="modalFormContent">
-      <div class="modal-header">
-        <div>
-          <div class="modal-title" id="modalTitle">Count us in!</div>
-          <div class="modal-date-label" id="modalDateLabel"></div>
-        </div>
-        <button class="modal-close" onclick="closeModal()">✕</button>
-      </div>
-
-      <div class="form-row">
-        <label class="form-label" for="fName">Your name <span>(or family name, e.g. "The Chens")</span></label>
-        <input type="text" class="form-input" id="fName" placeholder="Sarah Chen" autocomplete="name">
-      </div>
-
-      <div class="form-row">
-        <label class="form-label" for="fEmail">Email address <span>(for the calendar invite)</span></label>
-        <input type="email" class="form-input" id="fEmail" placeholder="sarah@email.com" autocomplete="email">
-      </div>
-
-      <div class="form-row-2">
-        <div class="form-row" style="margin-bottom:0">
-          <label class="form-label" for="fAdults"># Adults</label>
-          <select class="form-select" id="fAdults">
-            <option value="1">1</option>
-            <option value="2" selected>2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5+</option>
-          </select>
-        </div>
-        <div class="form-row" style="margin-bottom:0">
-          <label class="form-label" for="fKids"># Kids</label>
-          <select class="form-select" id="fKids">
-            <option value="0" selected>0</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4+</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="form-row" style="margin-top:1.1rem">
-        <label class="form-label" for="fAllergies">Food allergies or restrictions <span>(optional)</span></label>
-        <input type="text" class="form-input" id="fAllergies" placeholder="e.g. tree nuts, gluten-free">
-      </div>
-
-      <div class="form-row">
-        <label class="form-label" for="fComments">Anything else? <span>(optional)</span></label>
-        <textarea class="form-textarea" id="fComments" placeholder="We'll be a few minutes late… so excited… anything at all!"></textarea>
-      </div>
-
-      <div id="formError" style="color:#c0392b; font-size:0.83rem; margin-bottom:0.5rem; display:none;"></div>
-
-      <button class="form-submit" id="formSubmitBtn" onclick="submitRSVP()">Send my RSVP 🎉</button>
-    </div>
-
-    <div class="success-msg" id="successContent" style="display:none;">
-      <div class="success-icon">🥂</div>
-      <div class="success-title">You're on the list!</div>
-      <p class="success-body">
-        We'll review and confirm your spot — you'll receive a calendar invite
-        by email once approved. Can't wait to see you!
-      </p>
-    </div>
-  </div>
-</div>
-
-<script>
-// ══════════════════════════════════════════════════════
-//  CONFIGURATION — change these two values
-// ══════════════════════════════════════════════════════
-const SITE_PASSWORD = "croissant";       // ← CHANGE THIS if needed
-const SCRIPT_URL    = "YOUR_APPS_SCRIPT_WEB_APP_URL_HERE"; // ← CHANGE THIS after deploying Apps Script
-
-// ══════════════════════════════════════════════════════
-//  PASSWORD GATE
-// ══════════════════════════════════════════════════════
-function checkPassword() {
-  const input = document.getElementById("pwInput").value.trim();
-  if (input === SITE_PASSWORD) {
-    document.getElementById("gate").classList.add("fade-out");
-    setTimeout(() => {
-      document.getElementById("gate").style.display = "none";
-      document.getElementById("main").classList.add("visible");
-      loadDates();
-    }, 600);
-  } else {
-    document.getElementById("gateError").textContent = "That's not quite right — try again.";
-    document.getElementById("pwInput").value = "";
-    document.getElementById("pwInput").focus();
-  }
-}
-
-document.getElementById("pwInput").addEventListener("keydown", (e) => {
-  if (e.key === "Enter") checkPassword();
-});
-
-// ══════════════════════════════════════════════════════
-//  LOAD DATES FROM APPS SCRIPT
-// ══════════════════════════════════════════════════════
-let selectedDate = null;
-let isInterestMode = false;
-
-async function loadDates() {
-  try {
-    const res = await fetch(`${SCRIPT_URL}?action=getDates`);
-    const dates = await res.json();
-    renderDates(dates);
-  } catch (err) {
-    // If SCRIPT_URL not set, show demo dates
-    renderDates(getDemoDates());
-  }
-}
-
-function getDemoDates() {
-  // Demo data shown before you connect your Apps Script
-  return [
-    { date: "March 14, 2026",  status: "Open",        label: "",             spots: 12 },
-    { date: "March 28, 2026",  status: "Invite-Only",  label: "Board Game Day", spots: 0  },
-    { date: "April 11, 2026",  status: "Open",        label: "",             spots: 12 },
-    { date: "May 2, 2026",     status: "Open",        label: "",             spots: 12 },
-    { date: "May 16, 2026",    status: "Open",        label: "",             spots: 12 },
-    { date: "May 30, 2026",    status: "Open",        label: "",             spots: 12 },
-    { date: "June 13, 2026",   status: "Open",        label: "",             spots: 12 },
-    { date: "June 27, 2026",   status: "Open",        label: "",             spots: 12 },
-  ];
-}
-
-function renderDates(dates) {
-  document.getElementById("loadingState").style.display = "none";
-  const list = document.getElementById("datesList");
-  list.style.display = "flex";
-
-  if (!dates || dates.length === 0) {
-    list.innerHTML = `<p style="color:var(--muted); text-align:center; padding:2rem; font-weight:300;">No upcoming dates yet — check back soon!</p>`;
-    return;
-  }
-
-  dates.forEach((d, i) => {
-    const card = document.createElement("div");
-    card.className = "date-card";
-    card.style.animationDelay = `${i * 0.07}s`;
-
-    const parsed = new Date(d.date);
-    const month  = parsed.toLocaleString("default", { month: "long" });
-    const day    = parsed.getDate();
-    const year   = parsed.getFullYear();
-
-    let middleHTML = "";
-    let rightHTML  = "";
-
-    if (d.status === "Open") {
-      middleHTML = `<span class="date-spots">${d.spots} spot${d.spots !== 1 ? "s" : ""} left</span>`;
-      rightHTML  = `<button class="rsvp-btn" onclick="openModal('${d.date}', false)">I'm free! →</button>`;
-    } else if (d.status === "Full") {
-      middleHTML = `<span class="full-tag">Full</span>`;
-      rightHTML  = `<span class="full-tag">See you next time!</span>`;
-    } else if (d.status === "Invite-Only") {
-      middleHTML = `<span class="date-label">${d.label || "Private Event"}</span>`;
-      rightHTML  = `<button class="rsvp-btn" style="background:var(--sage)" onclick="openModal('${d.date}', true)">Express interest →</button>`;
-    }
-
-    card.innerHTML = `
-      <div class="date-left">
-        <div class="date-month">${month} ${year}</div>
-        <div class="date-day">${day}</div>
-        <div class="date-weekday">Saturday · 10:30 AM</div>
-      </div>
-      <div class="date-middle">${middleHTML}</div>
-      <div class="date-right">${rightHTML}</div>
-    `;
-    list.appendChild(card);
-  });
-}
-
-// ══════════════════════════════════════════════════════
-//  MODAL
-// ══════════════════════════════════════════════════════
-function openModal(date, interestMode) {
-  selectedDate = date;
-  isInterestMode = !!interestMode;
-  const title  = isInterestMode ? "I'd love to join!" : "Count us in!";
-  const btnTxt = isInterestMode ? "Express my interest 🙋" : "Send my RSVP 🎉";
-  document.getElementById("modalTitle").textContent = title;
-  document.getElementById("modalDateLabel").textContent = `Saturday, ${date} · 10:30 AM`;
-  document.getElementById("modalFormContent").style.display = "block";
-  document.getElementById("successContent").style.display = "none";
-  document.getElementById("formError").style.display = "none";
-  document.getElementById("formSubmitBtn").disabled = false;
-  document.getElementById("formSubmitBtn").textContent = btnTxt;
-  document.getElementById("modalBg").classList.add("open");
-  setTimeout(() => document.getElementById("fName").focus(), 300);
-}
-
-function closeModal() {
-  document.getElementById("modalBg").classList.remove("open");
-}
-
-function handleModalBgClick(e) {
-  if (e.target === document.getElementById("modalBg")) closeModal();
-}
-
-document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") closeModal();
-});
-
-// ══════════════════════════════════════════════════════
-//  RSVP SUBMISSION
-// ══════════════════════════════════════════════════════
-async function submitRSVP() {
-  const name      = document.getElementById("fName").value.trim();
-  const email     = document.getElementById("fEmail").value.trim();
-  const adults    = document.getElementById("fAdults").value;
-  const kids      = document.getElementById("fKids").value;
-  const allergies = document.getElementById("fAllergies").value.trim();
-  const comments  = document.getElementById("fComments").value.trim();
-  const errEl     = document.getElementById("formError");
-
-  // Validation
-  if (!name) return showFormError("Please enter your name.");
-  if (!email || !email.includes("@")) return showFormError("Please enter a valid email address.");
-
-  errEl.style.display = "none";
-  const btn = document.getElementById("formSubmitBtn");
-  btn.disabled = true;
-  btn.textContent = "Sending…";
-
-  const payload = { date: selectedDate, name, email, adults, kids, allergies, comments, interest: isInterestMode };
-
-  try {
-    await fetch(SCRIPT_URL, {
-      method: "POST",
-      mode: "no-cors",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-    showSuccess(isInterestMode);
-  } catch (err) {
-    showFormError("Something went wrong — please try again or email us directly.");
-    btn.disabled = false;
-    btn.textContent = "Send my RSVP 🎉";
-  }
-}
-
-function showFormError(msg) {
-  const errEl = document.getElementById("formError");
-  errEl.textContent = msg;
-  errEl.style.display = "block";
-}
-
-function showSuccess(interestMode) {
-  const title = interestMode ? "Interest noted!" : "You're on the list!";
-  const body  = interestMode
-    ? "We've got your note — we'll be in touch if we can make it work. So glad you're keen!"
-    : "We'll review and confirm your spot — you'll receive a calendar invite by email once approved. Can't wait to see you!";
-  document.querySelector("#successContent .success-title").textContent = title;
-  document.querySelector("#successContent .success-body").textContent  = body;
-  document.getElementById("modalFormContent").style.display = "none";
-  document.getElementById("successContent").style.display  = "block";
-}
-</script>
+<footer>
+  Made with love · anthonyandalexandra.com &nbsp;❤️
+</footer>
 
 </body>
 </html>

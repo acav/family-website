@@ -302,14 +302,14 @@ function renderDates(dates) {
     let middleHTML = "", rightHTML = "";
 
     if (d.status === "Open") {
-      middleHTML = `<span class="date-spots">${d.spots} spot${d.spots !== 1 ? "s" : ""} left</span>`;
-      rightHTML  = `<button class="rsvp-btn" onclick="openModal('${d.date}', false)">I'm free! →</button>`;
+      middleHTML = ``;
+      rightHTML  = `<div style="text-align:right"><button class="rsvp-btn" onclick="openModal('${d.date}', false)">I'm free! →</button><div class="date-spots" style="margin-top:0.4rem">${d.spots} spot${d.spots !== 1 ? "s" : ""} left</div></div>`;
     } else if (d.status === "Full") {
-      middleHTML = `<span class="full-tag">Full</span>`;
+      middleHTML = ``;
       rightHTML  = `<span class="full-tag">See you next time!</span>`;
     } else if (d.status === "Invite-Only") {
       middleHTML = `<span class="date-label">${d.label || "Private Event"}</span>`;
-      rightHTML  = `<button class="rsvp-btn" style="background:var(--sage)" onclick="openModal('${d.date}', true)">Express interest →</button>`;
+      rightHTML  = `<div style="text-align:right"><button class="rsvp-btn" style="background:var(--sage)" onclick="openModal('${d.date}', true)">Express interest →</button><div class="date-spots" style="margin-top:0.4rem">${d.spots} spot${d.spots !== 1 ? "s" : ""} left</div></div>`;
     }
 
     card.innerHTML = `

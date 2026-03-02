@@ -207,7 +207,7 @@
   <!-- UPCOMING EVENTS -->
   <div class="section">
     <h2 class="section-heading">Upcoming Events</h2>
-    <p class="section-sub">Something already on the calendar — want to join?</p>
+    <p class="section-sub" id="upcomingSub">Something already on the calendar — want to join?</p>
     <div class="loading" id="upcomingLoading"><div class="spinner"></div>Loading…</div>
     <div class="events-list" id="upcomingList" style="display:none;"></div>
   </div>
@@ -333,7 +333,8 @@ function renderAll(events) {
   const upcomingList = document.getElementById("upcomingList");
   upcomingList.style.display = "flex";
   if (upcoming.length === 0) {
-    upcomingList.innerHTML = `<p style="color:var(--muted); font-weight:300; padding:1rem 0;">Nothing scheduled yet — check back soon!</p>`;
+    document.getElementById("upcomingSub").textContent = "Nothing scheduled yet — check back soon!";
+    upcomingList.innerHTML = "";
   } else {
     upcoming.forEach((e, i) => upcomingList.appendChild(makeCard(e, i, false)));
   }
@@ -347,6 +348,10 @@ function renderAll(events) {
   if (toDo.length === 0)  toDoList.innerHTML  = `<p style="color:var(--muted); font-weight:300;">Nothing here yet!</p>`;
 
   document.getElementById("twoCol").style.display = "grid";
+}
+
+function escapeHtml(str) {
+  return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 }
 
 function makeCard(e, i, isCol) {
@@ -363,15 +368,18 @@ function makeCard(e, i, isCol) {
     metaHTML = e.label;
   }
 
-  const nameAttr = e.name.replace(/"/g, '&quot;');
+  const safeName  = escapeHtml(e.name);
+  const safeNotes = e.notes ? escapeHtml(e.notes) : "";
+  const safeMeta  = metaHTML ? escapeHtml(metaHTML) : "";
+
   card.innerHTML = `
     <div class="event-left">
-      ${metaHTML ? `<div class="event-meta">${metaHTML}</div>` : ""}
-      <div class="event-name">${e.name}</div>
-      ${e.notes ? `<div class="event-notes">${e.notes}</div>` : ""}
+      ${metaHTML ? `<div class="event-meta">${safeMeta}</div>` : ""}
+      <div class="event-name">${safeName}</div>
+      ${safeNotes ? `<div class="event-notes">${safeNotes}</div>` : ""}
     </div>
     <div class="event-right">
-      <button class="interest-btn" data-event="${nameAttr}" data-nodate="${!e.date}">I'm interested! →</button>
+      <button class="interest-btn" data-event="${escapeHtml(e.name)}" data-nodate="${!e.date}">I'm interested! →</button>
     </div>
   `;
   card.querySelector(".interest-btn").addEventListener("click", function() {

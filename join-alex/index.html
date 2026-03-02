@@ -77,8 +77,8 @@
   .section-heading { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: var(--green); margin-bottom: 0.5rem; }
   .section-sub { color: var(--muted); font-size: 0.9rem; margin-bottom: 2rem; font-weight: 300; }
 
-  /* two-column layout */
-  .two-col { display: flex; flex-direction: column; gap: 3rem; max-width: 900px; margin: 0 auto; padding: 2.5rem 1.5rem 3rem; }
+  /* categories layout */
+  .categories-container { max-width: 900px; margin: 0 auto; padding: 0 1.5rem 3rem; }
   .col-heading { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: var(--green); margin-bottom: 0.5rem; }
   .col-sub { color: var(--muted); font-size: 0.9rem; margin-bottom: 2rem; font-weight: 300; }
 
@@ -168,7 +168,6 @@
   @keyframes spin { to { transform: rotate(360deg); } }
 
   @media (max-width: 640px) {
-    .two-col { grid-template-columns: 1fr; }
     .event-card { flex-direction: column; align-items: flex-start; }
     .modal { padding: 1.6rem 1.4rem; }
   }
@@ -205,29 +204,17 @@
   </header>
 
   <!-- UPCOMING EVENTS -->
-  <div class="section">
+  <div class="section" id="upcomingSection">
     <h2 class="section-heading">Upcoming Events</h2>
     <p class="section-sub" id="upcomingSub">Some options coming up— want to join?</p>
     <div class="loading" id="upcomingLoading"><div class="spinner"></div>Loading…</div>
     <div class="events-list" id="upcomingList" style="display:none;"></div>
   </div>
 
-  <hr class="divider">
+  <hr class="divider" id="upcomingDivider">
 
   <!-- TWO COLUMN -->
-  <div class="two-col" id="twoCol" style="display:none;">
-    <div>
-      <h2 class="col-heading">Things to See</h2>
-      <p class="col-sub">Want to join me for one of these? Let me know!</p>
-      <div class="events-list" id="toSeeList"></div>
-    </div>
-    <hr class="divider" style="margin: 0;">
-    <div>
-      <h2 class="col-heading">Things to Do</h2>
-      <p class="col-sub">Want to join me for one of these? Let me know!</p>
-      <div class="events-list" id="toDoList"></div>
-    </div>
-  </div>
+  <div class="categories-container" id="categoriesContainer" style="display:none;"></div>
 
   <footer>Made with love for the people we love &nbsp;❤️</footer>
 </div>
@@ -323,31 +310,50 @@ function renderAll(events) {
     return new Date(e.date) >= now;
   }).sort((a, b) => new Date(a.date) - new Date(b.date));
 
-  const toSee = events.filter(e => e.status === "Open" && e.date === "" && e.category === "To See")
-    .sort((a, b) => (a.label || "").localeCompare(b.label || "") || a.name.localeCompare(b.name));
-  const toDo  = events.filter(e => e.status === "Open" && e.date === "" && e.category === "To Do")
-    .sort((a, b) => (a.label || "").localeCompare(b.label || "") || a.name.localeCompare(b.name));
-
   // Render upcoming
   document.getElementById("upcomingLoading").style.display = "none";
   const upcomingList = document.getElementById("upcomingList");
   upcomingList.style.display = "flex";
   if (upcoming.length === 0) {
-    document.getElementById("upcomingSub").textContent = "Nothing scheduled yet — check back soon!";
-    upcomingList.innerHTML = "";
+    document.getElementById("upcomingSection").style.display = "none";
+    document.getElementById("upcomingDivider").style.display = "none";
   } else {
     upcoming.forEach((e, i) => upcomingList.appendChild(makeCard(e, i, false)));
   }
 
-  // Render two-col
-  const toSeeList = document.getElementById("toSeeList");
-  const toDoList  = document.getElementById("toDoList");
-  toSee.forEach((e, i) => toSeeList.appendChild(makeCard(e, i, false)));
-  toDo.forEach((e, i)  => toDoList.appendChild(makeCard(e, i, false)));
-  if (toSee.length === 0) toSeeList.innerHTML = `<p style="color:var(--muted); font-weight:300;">Nothing here yet!</p>`;
-  if (toDo.length === 0)  toDoList.innerHTML  = `<p style="color:var(--muted); font-weight:300;">Nothing here yet!</p>`;
+  // Get unique categories from no-date events, sorted alphabetically
+  const noDateEvents = events.filter(e => e.status === "Open" && e.date === "");
+  const categories = [...new Set(noDateEvents.filter(e => e.category).map(e => e.category))].sort();
+  const uncategorized = noDateEvents.filter(e => !e.category);
+  if (uncategorized.length > 0) categories.push("Other");
 
-  document.getElementById("twoCol").style.display = "grid";
+  // Render category sections dynamically
+  const container = document.getElementById("categoriesContainer");
+  container.style.display = "block";
+
+  categories.forEach((cat, catIndex) => {
+    const catEvents = (cat === "Other" ? uncategorized : noDateEvents.filter(e => e.category === cat))
+      .sort((a, b) => (a.label || "").localeCompare(b.label || "") || a.name.localeCompare(b.name));
+
+    if (catIndex > 0) {
+      const divider = document.createElement("hr");
+      divider.className = "divider";
+      divider.style.margin = "3rem 0 0";
+      container.appendChild(divider);
+    }
+
+    const section = document.createElement("div");
+    section.style.paddingTop = "2.5rem";
+    section.innerHTML = `
+      <h2 class="col-heading">${cat}</h2>
+      <p class="col-sub">Want to join me for one of these? Let me know!</p>
+      <div class="events-list" id="catList-${catIndex}"></div>
+    `;
+    container.appendChild(section);
+
+    const list = section.querySelector(`#catList-${catIndex}`);
+    catEvents.forEach((e, i) => list.appendChild(makeCard(e, i, false)));
+  });
 }
 
 function escapeHtml(str) {

@@ -293,7 +293,7 @@ let selectedHasDate = false;
 
 async function loadEvents() {
   try {
-    const res = await fetch(`${SCRIPT_URL}?action=getEvents`);
+    const res = await fetch(`${SCRIPT_URL}?action=getEvents&t=${Date.now()}`);
     const events = await res.json();
     renderAll(events);
   } catch(err) {

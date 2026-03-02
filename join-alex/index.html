@@ -78,9 +78,9 @@
   .section-sub { color: var(--muted); font-size: 0.9rem; margin-bottom: 2rem; font-weight: 300; }
 
   /* two-column layout */
-  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; max-width: 900px; margin: 0 auto; padding: 2.5rem 1.5rem 3rem; }
-  .col-heading { font-family: 'Playfair Display', serif; font-size: 1.3rem; color: var(--green); margin-bottom: 0.4rem; }
-  .col-sub { color: var(--muted); font-size: 0.85rem; margin-bottom: 1.5rem; font-weight: 300; }
+  .two-col { display: flex; flex-direction: column; gap: 3rem; max-width: 900px; margin: 0 auto; padding: 2.5rem 1.5rem 3rem; }
+  .col-heading { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: var(--green); margin-bottom: 0.5rem; }
+  .col-sub { color: var(--muted); font-size: 0.9rem; margin-bottom: 2rem; font-weight: 300; }
 
   /* ── EVENT CARDS ── */
   .events-list { display: flex; flex-direction: column; gap: 1rem; }
@@ -221,6 +221,7 @@
       <p class="col-sub">Want to join me for one of these? Let me know!</p>
       <div class="events-list" id="toSeeList"></div>
     </div>
+    <hr class="divider" style="margin: 0;">
     <div>
       <h2 class="col-heading">Things to Do</h2>
       <p class="col-sub">Want to join me for one of these? Let me know!</p>
@@ -341,8 +342,8 @@ function renderAll(events) {
   // Render two-col
   const toSeeList = document.getElementById("toSeeList");
   const toDoList  = document.getElementById("toDoList");
-  toSee.forEach((e, i) => toSeeList.appendChild(makeCard(e, i, true)));
-  toDo.forEach((e, i)  => toDoList.appendChild(makeCard(e, i, true)));
+  toSee.forEach((e, i) => toSeeList.appendChild(makeCard(e, i, false)));
+  toDo.forEach((e, i)  => toDoList.appendChild(makeCard(e, i, false)));
   if (toSee.length === 0) toSeeList.innerHTML = `<p style="color:var(--muted); font-weight:300;">Nothing here yet!</p>`;
   if (toDo.length === 0)  toDoList.innerHTML  = `<p style="color:var(--muted); font-weight:300;">Nothing here yet!</p>`;
 

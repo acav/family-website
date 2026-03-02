@@ -383,7 +383,7 @@ function makeCard(e, i, isCol) {
       ${safeNotes ? `<div class="event-notes">${safeNotes}</div>` : ""}
     </div>
     <div class="event-right">
-      <button class="interest-btn" data-event="${escapeHtml(e.name)}" data-nodate="${!e.date}">I'm interested! →</button>
+      <button class="interest-btn" data-event="${escapeHtml(e.name)}" data-nodate="${!e.date}">I'm in! →</button>
     </div>
   `;
   card.querySelector(".interest-btn").addEventListener("click", function() {

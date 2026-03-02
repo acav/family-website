@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alex's Wishlist of Friend Dates</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --cream:   #F4F7FA;
+    --green:   #1E3A5F;
+    --sage:    #5B8DB8;
+    --blush:   #A8C8E8;
+    --warm:    #E0EBF5;
+    --text:    #1A2634;
+    --muted:   #6B7D8E;
+    --white:   #FFFFFF;
+    --radius:  12px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text); min-height: 100vh; }
+
+  /* ── PASSWORD GATE ── */
+  #gate {
+    position: fixed; inset: 0; background: var(--green);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    z-index: 1000; transition: opacity 0.6s ease;
+  }
+  #gate.fade-out { opacity: 0; pointer-events: none; }
+  .gate-inner { text-align: center; animation: fadeUp 0.8s ease both; max-width: 340px; }
+  .gate-leaf { font-size: 2.5rem; margin-bottom: 1.5rem; display: block; }
+  .gate-title { font-family: 'Playfair Display', serif; color: var(--white); font-size: clamp(1.8rem, 5vw, 2.8rem); margin-bottom: 0.5rem; }
+  .gate-sub { color: var(--sage); font-size: 1rem; font-weight: 300; margin-bottom: 2.5rem; letter-spacing: 0.05em; }
+  .gate-form { display: flex; gap: 0.5rem; flex-direction: column; align-items: center; width: 100%; }
+  .gate-input {
+    width: 100%; padding: 0.85rem 1.2rem;
+    background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2);
+    border-radius: var(--radius); color: var(--white); font-family: 'DM Sans', sans-serif;
+    font-size: 1rem; text-align: center; letter-spacing: 0.15em; outline: none; transition: border-color 0.2s;
+  }
+  .gate-input::placeholder { color: rgba(255,255,255,0.3); letter-spacing: 0.05em; }
+  .gate-input:focus { border-color: var(--blush); }
+  .gate-btn {
+    width: 100%; padding: 0.85rem; background: var(--blush); border: none;
+    border-radius: var(--radius); color: var(--green); font-family: 'DM Sans', sans-serif;
+    font-weight: 500; font-size: 0.95rem; cursor: pointer; transition: background 0.2s, transform 0.1s; margin-top: 0.25rem;
+  }
+  .gate-btn:hover { background: #bdd4ec; transform: translateY(-1px); }
+  .gate-error { color: #FF9999; font-size: 0.85rem; margin-top: 0.5rem; min-height: 1.2em; }
+
+  /* ── MAIN ── */
+  #main { display: none; }
+  #main.visible { display: block; }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--green); padding: 3.5rem 2rem 3rem;
+    text-align: center; position: relative; overflow: hidden;
+  }
+  header::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 30% 50%, rgba(91,141,184,0.2) 0%, transparent 60%),
+                radial-gradient(ellipse at 70% 20%, rgba(168,200,232,0.1) 0%, transparent 50%);
+    pointer-events: none;
+  }
+  .header-icon { font-size: 2.2rem; display: block; margin-bottom: 1rem; }
+  .header-title { font-family: 'Playfair Display', serif; color: var(--white); font-size: clamp(2rem, 6vw, 3.2rem); line-height: 1.2; margin-bottom: 1.2rem; }
+  .header-title em { font-style: italic; color: var(--blush); }
+  .header-intro { max-width: 600px; margin: 0 auto; color: rgba(255,255,255,0.75); font-size: 1rem; font-weight: 300; line-height: 1.7; }
+
+  /* ── SECTIONS ── */
+  .section { max-width: 900px; margin: 0 auto; padding: 3rem 1.5rem; }
+  .section-heading { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: var(--green); margin-bottom: 0.5rem; }
+  .section-sub { color: var(--muted); font-size: 0.9rem; margin-bottom: 2rem; font-weight: 300; }
+
+  /* two-column layout */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; max-width: 900px; margin: 0 auto; padding: 2.5rem 1.5rem 3rem; }
+  .col-heading { font-family: 'Playfair Display', serif; font-size: 1.3rem; color: var(--green); margin-bottom: 0.4rem; }
+  .col-sub { color: var(--muted); font-size: 0.85rem; margin-bottom: 1.5rem; font-weight: 300; }
+
+  /* ── EVENT CARDS ── */
+  .events-list { display: flex; flex-direction: column; gap: 1rem; }
+
+  .event-card {
+    background: var(--white); border-radius: var(--radius); border: 1px solid rgba(0,0,0,0.07);
+    padding: 1.4rem 1.6rem; display: flex; align-items: center; justify-content: space-between;
+    gap: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    transition: box-shadow 0.2s, transform 0.2s; animation: fadeUp 0.4s ease both;
+  }
+  .event-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); transform: translateY(-1px); }
+
+  .event-left { flex: 1; }
+  .event-meta {
+    font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.12em;
+    color: var(--sage); font-weight: 500; margin-bottom: 0.25rem;
+  }
+  .event-name { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--green); line-height: 1.2; }
+  .event-notes { font-size: 0.82rem; color: var(--muted); margin-top: 0.2rem; font-weight: 300; }
+
+  /* smaller cards for two-col */
+  .col-card .event-name { font-size: 1.15rem; }
+
+  .event-right { flex-shrink: 0; }
+  .interest-btn {
+    padding: 0.6rem 1.4rem; background: var(--green); color: var(--white);
+    border: none; border-radius: 50px; font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem; font-weight: 500; cursor: pointer;
+    transition: background 0.2s, transform 0.1s; white-space: nowrap;
+  }
+  .interest-btn:hover { background: #2a527a; transform: translateY(-1px); }
+
+  .loading { text-align: center; color: var(--muted); padding: 3rem; font-size: 0.9rem; }
+  .spinner { width: 28px; height: 28px; border: 2px solid var(--warm); border-top-color: var(--sage); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 1rem; }
+
+  .divider { border: none; border-top: 1px solid rgba(0,0,0,0.06); margin: 0 1.5rem; }
+
+  /* ── MODAL ── */
+  .modal-bg {
+    position: fixed; inset: 0; background: rgba(44,44,44,0.55);
+    backdrop-filter: blur(4px); z-index: 500;
+    display: flex; align-items: center; justify-content: center;
+    padding: 1.5rem; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+  }
+  .modal-bg.open { opacity: 1; pointer-events: all; }
+  .modal {
+    background: var(--white); border-radius: 16px; max-width: 480px; width: 100%;
+    padding: 2.2rem 2rem; box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    transform: translateY(20px); transition: transform 0.3s; max-height: 90vh; overflow-y: auto;
+  }
+  .modal-bg.open .modal { transform: translateY(0); }
+  .modal-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 1.8rem; }
+  .modal-title { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--green); line-height: 1.2; }
+  .modal-event-label { font-size: 0.85rem; color: var(--muted); margin-top: 0.2rem; font-weight: 300; }
+  .modal-close { background: none; border: none; font-size: 1.3rem; cursor: pointer; color: var(--muted); line-height: 1; padding: 0.2rem; transition: color 0.2s; }
+  .modal-close:hover { color: var(--text); }
+
+  .form-row { margin-bottom: 1.1rem; }
+  .form-label { display: block; font-size: 0.82rem; font-weight: 500; color: var(--green); margin-bottom: 0.35rem; letter-spacing: 0.02em; }
+  .form-label span { color: var(--muted); font-weight: 400; }
+  .form-input, .form-textarea {
+    width: 100%; padding: 0.7rem 0.9rem; border: 1.5px solid #E0DDD8; border-radius: 8px;
+    font-family: 'DM Sans', sans-serif; font-size: 0.93rem; color: var(--text);
+    background: var(--cream); outline: none; transition: border-color 0.2s, background 0.2s;
+  }
+  .form-input:focus, .form-textarea:focus { border-color: var(--sage); background: var(--white); }
+  .form-textarea { resize: vertical; min-height: 80px; }
+  .form-submit {
+    width: 100%; padding: 0.85rem; background: var(--green); color: var(--white);
+    border: none; border-radius: 50px; font-family: 'DM Sans', sans-serif;
+    font-size: 1rem; font-weight: 500; cursor: pointer; margin-top: 0.5rem;
+    transition: background 0.2s, transform 0.1s;
+  }
+  .form-submit:hover { background: #2a527a; transform: translateY(-1px); }
+  .form-submit:disabled { background: var(--sage); cursor: not-allowed; transform: none; }
+
+  .success-msg { text-align: center; padding: 1rem 0; }
+  .success-icon { font-size: 2.5rem; margin-bottom: 1rem; }
+  .success-title { font-family: 'Playfair Display', serif; color: var(--green); font-size: 1.4rem; margin-bottom: 0.5rem; }
+  .success-body { color: var(--muted); font-size: 0.9rem; line-height: 1.6; font-weight: 300; }
+
+  footer { text-align: center; padding: 2.5rem 1.5rem; color: var(--muted); font-size: 0.8rem; font-weight: 300; border-top: 1px solid rgba(0,0,0,0.06); }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  @media (max-width: 640px) {
+    .two-col { grid-template-columns: 1fr; }
+    .event-card { flex-direction: column; align-items: flex-start; }
+    .modal { padding: 1.6rem 1.4rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- PASSWORD GATE -->
+<div id="gate">
+  <div class="gate-inner">
+    <span class="gate-leaf">🎉</span>
+    <h1 class="gate-title">Alex's Wishlist of Friend Dates</h1>
+    <p class="gate-sub">I've made it a goal to seek out more joy & reconnect!</p>
+    <div class="gate-form">
+      <input type="password" class="gate-input" id="pwInput" placeholder="enter password" autocomplete="off" autofocus>
+      <button class="gate-btn" onclick="checkPassword()">Enter</button>
+      <span class="gate-error" id="gateError"></span>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div id="main">
+  <header>
+    <span class="header-icon">🎉</span>
+    <h1 class="header-title">Alex's Wishlist of<br><em>Friend Dates</em></h1>
+    <p class="header-intro">
+      In the past year, the most joy in my life has come from doing things with the people I love.
+      As much as I love a good coffee or meal, NYC has so much more to offer!<br><br>Taking inspiration
+      from friends, here's a list of things I'd love to do with you. I've tried to include something
+      for everyone but am also up for ideas. If you're game, text me what interests you and we'll
+      get it scheduled!
+    </p>
+  </header>
+
+  <!-- UPCOMING EVENTS -->
+  <div class="section">
+    <h2 class="section-heading">Upcoming Events</h2>
+    <p class="section-sub">Something already on the calendar — want to join?</p>
+    <div class="loading" id="upcomingLoading"><div class="spinner"></div>Loading…</div>
+    <div class="events-list" id="upcomingList" style="display:none;"></div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- TWO COLUMN -->
+  <div class="two-col" id="twoCol" style="display:none;">
+    <div>
+      <h2 class="col-heading">Things to See</h2>
+      <p class="col-sub">Want to join me for one of these? Let me know!</p>
+      <div class="events-list" id="toSeeList"></div>
+    </div>
+    <div>
+      <h2 class="col-heading">Things to Do</h2>
+      <p class="col-sub">Want to join me for one of these? Let me know!</p>
+      <div class="events-list" id="toDoList"></div>
+    </div>
+  </div>
+
+  <footer>Made with love for the people we love &nbsp;❤️</footer>
+</div>
+
+<!-- MODAL -->
+<div class="modal-bg" id="modalBg" onclick="handleModalBgClick(event)">
+  <div class="modal">
+    <div id="modalFormContent">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title">I'm interested! 🎉</div>
+          <div class="modal-event-label" id="modalEventLabel"></div>
+        </div>
+        <button class="modal-close" onclick="closeModal()">✕</button>
+      </div>
+      <div class="form-row">
+        <label class="form-label" for="fName">Your name</label>
+        <input type="text" class="form-input" id="fName" placeholder="Sarah Chen" autocomplete="name">
+      </div>
+      <div class="form-row">
+        <label class="form-label" for="fEmail">Email address</label>
+        <input type="email" class="form-input" id="fEmail" placeholder="sarah@email.com" autocomplete="email">
+      </div>
+      <div class="form-row">
+        <label class="form-label" for="fMessage">Message <span>(optional)</span></label>
+        <textarea class="form-textarea" id="fMessage" placeholder=""></textarea>
+      </div>
+      <div id="formError" style="color:#c0392b; font-size:0.83rem; margin-bottom:0.5rem; display:none;"></div>
+      <button class="form-submit" id="formSubmitBtn" onclick="submitInterest()">Send my interest! 🎉</button>
+    </div>
+    <div class="success-msg" id="successContent" style="display:none;">
+      <div class="success-icon">🎉</div>
+      <div class="success-title">Yay, noted!</div>
+      <p class="success-body">Alex will be in touch to get it scheduled. So excited!</p>
+    </div>
+  </div>
+</div>
+
+<script>
+const SITE_PASSWORD = "letshang";
+const SCRIPT_URL    = "https://script.google.com/macros/s/AKfycbzCawgJ8us-dQPam_xpiCwhguPi6-fwYvVcsQEBowVoJpgQf8iH7dLMH3hV-Rl6FI8FDw/exec";
+
+// ── PASSWORD ──
+function checkPassword() {
+  const input = document.getElementById("pwInput").value.trim();
+  if (input === SITE_PASSWORD) {
+    document.getElementById("gate").classList.add("fade-out");
+    setTimeout(() => {
+      document.getElementById("gate").style.display = "none";
+      document.getElementById("main").classList.add("visible");
+      loadEvents();
+    }, 600);
+  } else {
+    document.getElementById("gateError").textContent = "That's not quite right — try again.";
+    document.getElementById("pwInput").value = "";
+    document.getElementById("pwInput").focus();
+  }
+}
+document.getElementById("pwInput").addEventListener("keydown", (e) => { if (e.key === "Enter") checkPassword(); });
+
+// ── LOAD EVENTS ──
+let selectedEvent = null;
+let selectedHasDate = false;
+
+async function loadEvents() {
+  try {
+    const res = await fetch(`${SCRIPT_URL}?action=getEvents`);
+    const events = await res.json();
+    renderAll(events);
+  } catch(err) {
+    renderAll(getDemoEvents());
+  }
+}
+
+function getDemoEvents() {
+  return [
+    { name: "Sleep No More",     category: "To See", date: "March 10, 2026", time: "7:00 PM", label: "Theater",    notes: "Immersive theater experience",     status: "Open" },
+    { name: "Jazz at Lincoln Center", category: "To See", date: "", time: "", label: "Music", notes: "World class jazz",  status: "Open" },
+    { name: "MoMA Visit",        category: "To See", date: "", time: "",      label: "Art",       notes: "New exhibition up",                status: "Open" },
+    { name: "Cooking Class",     category: "To Do",  date: "March 22, 2026", time: "6:00 PM", label: "Food",      notes: "Italian pasta making",             status: "Open" },
+    { name: "Escape Room",       category: "To Do",  date: "", time: "",      label: "Games",     notes: "Any of the good ones in Midtown",  status: "Open" },
+    { name: "Kayaking",          category: "To Do",  date: "", time: "",      label: "Outdoors",  notes: "Hudson River, weather permitting", status: "Open" },
+  ];
+}
+
+function renderAll(events) {
+  const now = new Date();
+  now.setHours(0,0,0,0);
+
+  // Upcoming: has a date, date is in the future, status Open
+  const upcoming = events.filter(e => {
+    if (e.status !== "Open" || !e.date) return false;
+    return new Date(e.date) >= now;
+  }).sort((a, b) => new Date(a.date) - new Date(b.date));
+
+  // No-date items
+  const toSee = events.filter(e => e.status === "Open" && !e.date && e.category === "To See")
+    .sort((a, b) => (a.label || "").localeCompare(b.label || ""));
+  const toDo  = events.filter(e => e.status === "Open" && !e.date && e.category === "To Do")
+    .sort((a, b) => (a.label || "").localeCompare(b.label || ""));
+
+  // Render upcoming
+  document.getElementById("upcomingLoading").style.display = "none";
+  const upcomingList = document.getElementById("upcomingList");
+  upcomingList.style.display = "flex";
+  if (upcoming.length === 0) {
+    upcomingList.innerHTML = `<p style="color:var(--muted); font-weight:300; padding:1rem 0;">Nothing scheduled yet — check back soon!</p>`;
+  } else {
+    upcoming.forEach((e, i) => upcomingList.appendChild(makeCard(e, i, false)));
+  }
+
+  // Render two-col
+  const toSeeList = document.getElementById("toSeeList");
+  const toDoList  = document.getElementById("toDoList");
+  toSee.forEach((e, i) => toSeeList.appendChild(makeCard(e, i, true)));
+  toDo.forEach((e, i)  => toDoList.appendChild(makeCard(e, i, true)));
+  if (toSee.length === 0) toSeeList.innerHTML = `<p style="color:var(--muted); font-weight:300;">Nothing here yet!</p>`;
+  if (toDo.length === 0)  toDoList.innerHTML  = `<p style="color:var(--muted); font-weight:300;">Nothing here yet!</p>`;
+
+  document.getElementById("twoCol").style.display = "grid";
+}
+
+function makeCard(e, i, isCol) {
+  const card = document.createElement("div");
+  card.className = "event-card" + (isCol ? " col-card" : "");
+  card.style.animationDelay = `${i * 0.07}s`;
+
+  let metaHTML = "";
+  if (e.date) {
+    const parsed = new Date(e.date);
+    const datePart = parsed.toLocaleDateString("en-US", { month: "long", day: "numeric" });
+    metaHTML = e.time ? `${datePart} · ${e.time}` : datePart;
+  } else if (e.label) {
+    metaHTML = e.label;
+  }
+
+  const nameAttr = e.name.replace(/"/g, '&quot;');
+  card.innerHTML = `
+    <div class="event-left">
+      ${metaHTML ? `<div class="event-meta">${metaHTML}</div>` : ""}
+      <div class="event-name">${e.name}</div>
+      ${e.notes ? `<div class="event-notes">${e.notes}</div>` : ""}
+    </div>
+    <div class="event-right">
+      <button class="interest-btn" data-event="${nameAttr}" data-nodate="${!e.date}">I'm interested! →</button>
+    </div>
+  `;
+  card.querySelector(".interest-btn").addEventListener("click", function() {
+    openModal(this.dataset.event, this.dataset.nodate === "true");
+  });
+  return card;
+}
+
+// ── MODAL ──
+function openModal(eventName, noDate) {
+  selectedEvent = eventName;
+  selectedHasDate = !noDate;
+  document.getElementById("modalEventLabel").textContent = eventName;
+  document.getElementById("modalFormContent").style.display = "block";
+  document.getElementById("successContent").style.display = "none";
+  document.getElementById("formError").style.display = "none";
+  document.getElementById("formSubmitBtn").disabled = false;
+  document.getElementById("fMessage").placeholder = noDate
+    ? "Any times that work well for you? Or anything else to share!"
+    : "Any notes for Alex?";
+  document.getElementById("fName").value = "";
+  document.getElementById("fEmail").value = "";
+  document.getElementById("fMessage").value = "";
+  document.getElementById("modalBg").classList.add("open");
+  setTimeout(() => document.getElementById("fName").focus(), 300);
+}
+
+function closeModal() { document.getElementById("modalBg").classList.remove("open"); }
+function handleModalBgClick(e) { if (e.target === document.getElementById("modalBg")) closeModal(); }
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeModal(); });
+
+// ── SUBMIT ──
+async function submitInterest() {
+  const name    = document.getElementById("fName").value.trim();
+  const email   = document.getElementById("fEmail").value.trim();
+  const message = document.getElementById("fMessage").value.trim();
+
+  if (!name) return showFormError("Please enter your name.");
+  if (!email || !email.includes("@")) return showFormError("Please enter a valid email address.");
+
+  document.getElementById("formError").style.display = "none";
+  const btn = document.getElementById("formSubmitBtn");
+  btn.disabled = true;
+  btn.textContent = "Sending…";
+
+  const payload = new URLSearchParams({ event: selectedEvent, name, email, message: message || "" });
+
+  try {
+    await fetch(SCRIPT_URL, {
+      method: "POST", mode: "no-cors",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: payload.toString(),
+    });
+    document.getElementById("modalFormContent").style.display = "none";
+    document.getElementById("successContent").style.display = "block";
+  } catch(err) {
+    showFormError("Something went wrong — please try again.");
+    btn.disabled = false;
+    btn.textContent = "Send my interest! 🎉";
+  }
+}
+
+function showFormError(msg) {
+  const errEl = document.getElementById("formError");
+  errEl.textContent = msg;
+  errEl.style.display = "block";
+}
+</script>
+</body>
+</html>

@@ -324,9 +324,9 @@ function renderAll(events) {
 
   // No-date items
   const toSee = events.filter(e => e.status === "Open" && !e.date && e.category === "To See")
-    .sort((a, b) => (a.label || "").localeCompare(b.label || ""));
+    .sort((a, b) => (a.label || "").localeCompare(b.label || "") || a.name.localeCompare(b.name));
   const toDo  = events.filter(e => e.status === "Open" && !e.date && e.category === "To Do")
-    .sort((a, b) => (a.label || "").localeCompare(b.label || ""));
+    .sort((a, b) => (a.label || "").localeCompare(b.label || "") || a.name.localeCompare(b.name));
 
   // Render upcoming
   document.getElementById("upcomingLoading").style.display = "none";

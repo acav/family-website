@@ -318,14 +318,13 @@ function renderAll(events) {
 
   // Upcoming: has a date, date is in the future, status Open
   const upcoming = events.filter(e => {
-    if (e.status !== "Open" || !e.date) return false;
+    if (e.status !== "Open" || !e.date || e.date.trim() === "") return false;
     return new Date(e.date) >= now;
   }).sort((a, b) => new Date(a.date) - new Date(b.date));
 
-  // No-date items
-  const toSee = events.filter(e => e.status === "Open" && !e.date && e.category === "To See")
+  const toSee = events.filter(e => e.status === "Open" && e.date === "" && e.category === "To See")
     .sort((a, b) => (a.label || "").localeCompare(b.label || "") || a.name.localeCompare(b.name));
-  const toDo  = events.filter(e => e.status === "Open" && !e.date && e.category === "To Do")
+  const toDo  = events.filter(e => e.status === "Open" && e.date === "" && e.category === "To Do")
     .sort((a, b) => (a.label || "").localeCompare(b.label || "") || a.name.localeCompare(b.name));
 
   // Render upcoming

@@ -301,10 +301,10 @@ function renderDates(dates) {
 
     let middleHTML = "", rightHTML = "";
 
-    if (d.status === "Open") {
+    if (d.status === "Open" && d.spots > 0) {
       middleHTML = ``;
       rightHTML  = `<div style="text-align:right"><button class="rsvp-btn" onclick="openModal('${d.date}', false)">I'm free! →</button><div class="date-spots" style="margin-top:0.4rem">${d.spots} spot${d.spots !== 1 ? "s" : ""} left</div></div>`;
-    } else if (d.status === "Full") {
+    } else if (d.status === "Full" || (d.status === "Open" && d.spots <= 0)) {
       middleHTML = ``;
       rightHTML  = `<span class="full-tag">See you next time!</span>`;
     } else if (d.status === "Invite-Only") {
